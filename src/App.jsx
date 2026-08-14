@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 import BalanceDisplay from './components/BalanceDisplay';
 import PaymentForm from './components/PaymentForm';
+import TransactionStatus from './components/TransactionStatus';
 import WalletConnect from './components/WalletConnect';
 import { NETWORK_NAME } from './lib/constants';
 import {
   buildPaymentTransaction,
   fetchXlmBalance,
+  formatError,
   fundAccount,
   isAccountNotFound,
   submitSignedTransaction,
@@ -143,7 +145,7 @@ export default function App() {
       setTxStatus({ status: 'success', hash: result.hash });
       refreshBalance(address);
     } catch (err) {
-      setTxStatus({ status: 'error', error: err?.message || 'Payment failed.' });
+      setTxStatus({ status: 'error', error: formatError(err) });
     }
   }
 
@@ -187,6 +189,13 @@ export default function App() {
             disabled={!readyToSend}
             submitting={txStatus.status === 'pending'}
             onSubmit={handleSendPayment}
+          />
+
+          <TransactionStatus
+            status={txStatus.status}
+            hash={txStatus.hash}
+            error={txStatus.error}
+            onReset={() => setTxStatus({ status: 'idle' })}
           />
         </div>
       </div>

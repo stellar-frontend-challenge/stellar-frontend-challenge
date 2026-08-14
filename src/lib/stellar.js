@@ -5,6 +5,7 @@ import {
   NotFoundError,
   Operation,
   TransactionBuilder,
+  TransactionFailedError,
 } from '@stellar/stellar-sdk';
 
 import {
@@ -81,4 +82,36 @@ export async function submitSignedTransaction(signedTxXdr) {
     NETWORK_PASSPHRASE,
   );
   return server.submitTransaction(transaction);
+}
+
+/** Converts SDK and network errors into user-friendly messages. */
+export function formatError(error) {
+  if (error instanceof TransactionFailedError) {
+    const { operations } = error.getResultCodes();
+    const code = operations?.[0];
+    const messages = {
+      op_underfunded:
+        'Insufficient XLM balance to cover the payment and transaction fee.',
+      op_no_destination:
+        'The destination account does not exist yet and must be funded first.',
+      op_no_trust: 'The destination does not accept this asset.',
+      op_line_full: 'The destination trustline is at its limit.',
+      op_low_reserve: 'Not enough XLM to meet the minimum balance reserve.',
+      tx_bad_seq: 'Transaction sequence is stale. Please refresh and try again.',
+      tx_insufficient_fee: 'Insufficient fee to submit the transaction.',
+      tx_bad_auth: 'The transaction was not properly signed.',
+    };
+    if (code && messages[code]) return messages[code];
+    return `Transaction failed${code ? ` (${code})` : ''}.`;
+  }
+
+  if (error instanceof NotFoundError) {
+    return 'Account not found on the Stellar Testnet.';
+  }
+
+  if (error?.response?.status === 429) {
+    return 'Too many requests. Please wait a moment and try again.';
+  }
+
+  return error?.message || 'Something went wrong. Please try again.';
 }

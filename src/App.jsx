@@ -154,20 +154,21 @@ export default function App() {
     }
   }
 
-  async function handleSendPayment(destination, amount) {
+  async function handleSendPayment(destination, amount, memo) {
     setTxStatus({ status: 'pending' });
     try {
       const transaction = await buildPaymentTransaction({
         sourcePublicKey: address,
         destination,
         amount,
+        memo,
       });
       const { signedTxXdr } = await signTransactionXdr(
         transaction.toXDR(),
         address,
       );
       const result = await submitSignedTransaction(signedTxXdr);
-      setTxStatus({ status: 'success', hash: result.hash });
+      setTxStatus({ status: 'success', hash: result.hash, memo });
       refreshBalance(address);
     } catch (err) {
       setTxStatus({ status: 'error', error: formatError(err) });

@@ -20,3 +20,45 @@ export function validateAmount(input) {
   }
   return { valid: true, value: trimmed };
 }
+
+const MAX_UINT64 = 18446744073709551615n;
+
+/**
+ * Validates an optional memo. `type` is one of "none", "text", or "id".
+ * Returns `{ valid, memo }` where `memo` is null (no memo) or
+ * `{ type, value }`. On failure returns `{ valid, error }`.
+ */
+export function validateMemo(type, value) {
+  if (type === 'none' || !type) return { valid: true, memo: null };
+
+  const trimmed = (value ?? '').trim();
+  if (!trimmed) {
+    return { valid: false, error: 'Memo is required when a memo type is selected.' };
+  }
+
+  if (type === 'text') {
+    const bytes = new TextEncoder().encode(trimmed).length;
+    if (bytes > 28) {
+      return { valid: false, error: 'Text memo must be at most 28 bytes.' };
+    }
+    return { valid: true, memo: { type: 'text', value: trimmed } };
+  }
+
+  if (type === 'id') {
+    if (!/^\d+$/.test(trimmed)) {
+      return { valid: false, error: 'Memo ID must be a whole number.' };
+    }
+    let fits = false;
+    try {
+      fits = BigInt(trimmed) <= MAX_UINT64;
+    } catch {
+      fits = false;
+    }
+    if (!fits) {
+      return { valid: false, error: 'Memo ID must be an unsigned 64-bit integer.' };
+    }
+    return { valid: true, memo: { type: 'id', value: trimmed } };
+  }
+
+  return { valid: false, error: 'Unknown memo type.' };
+}

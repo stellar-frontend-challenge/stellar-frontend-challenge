@@ -1,6 +1,6 @@
 import { STELLAR_EXPERT_TX_URL } from '../lib/constants';
 
-export default function TransactionStatus({ status, hash, error, onReset }) {
+export default function TransactionStatus({ status, hash, memo, error, onReset }) {
   if (status === 'idle') return null;
 
   if (status === 'pending') {
@@ -23,6 +23,12 @@ export default function TransactionStatus({ status, hash, error, onReset }) {
         <p className="mt-1 break-all font-mono text-sm text-emerald-200">
           {hash}
         </p>
+        {memo && (
+          <p className="mt-2 text-sm text-emerald-200/80">
+            Memo ({memo.type === 'id' ? 'ID' : 'text'}):{' '}
+            <span className="font-mono">{memo.value}</span>
+          </p>
+        )}
         <a
           href={`${STELLAR_EXPERT_TX_URL}/${hash}`}
           target="_blank"

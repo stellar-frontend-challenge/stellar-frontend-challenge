@@ -2,6 +2,7 @@ import {
   Asset,
   Horizon,
   Keypair,
+  Memo,
   NotFoundError,
   Operation,
   TransactionBuilder,
@@ -51,16 +52,20 @@ export async function fundAccount(publicKey) {
   return response.json();
 }
 
-/** Builds an unsigned XLM payment transaction for the given source account. */
+/**
+ * Builds an unsigned XLM payment transaction for the given source account.
+ * `memo` is optional and should be `null` or `{ type: 'text' | 'id', value }`.
+ */
 export async function buildPaymentTransaction({
   sourcePublicKey,
   destination,
   amount,
+  memo = null,
 }) {
   const sourceAccount = await server.loadAccount(sourcePublicKey);
   const baseFee = await server.fetchBaseFee().catch(() => 100);
 
-  return new TransactionBuilder(sourceAccount, {
+  const builder = new TransactionBuilder(sourceAccount, {
     fee: baseFee.toString(),
     networkPassphrase: NETWORK_PASSPHRASE,
   })
@@ -71,8 +76,12 @@ export async function buildPaymentTransaction({
         amount: amount.toString(),
       }),
     )
-    .setTimeout(60)
-    .build();
+    .setTimeout(60);
+
+  if (memo?.type === 'text') builder.addMemo(Memo.text(memo.value));
+  if (memo?.type === 'id') builder.addMemo(Memo.id(memo.value));
+
+  return builder.build();
 }
 
 /** Rehydrates a signed XDR string and submits it to Horizon. */

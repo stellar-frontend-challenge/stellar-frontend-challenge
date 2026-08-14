@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { validateAmount } from '../lib/format';
+import { validateAmount, validateMemo } from '../lib/format';
 import { isValidAddress } from '../lib/stellar';
 
 export default function PaymentForm({
@@ -11,6 +11,8 @@ export default function PaymentForm({
 }) {
   const [destination, setDestination] = useState('');
   const [amount, setAmount] = useState('');
+  const [memoType, setMemoType] = useState('none');
+  const [memo, setMemo] = useState('');
   const [errors, setErrors] = useState({});
 
   function handleSubmit(event) {
@@ -31,10 +33,15 @@ export default function PaymentForm({
       nextErrors.amount = amountResult.error;
     }
 
+    const memoResult = validateMemo(memoType, memo);
+    if (!memoResult.valid) {
+      nextErrors.memo = memoResult.error;
+    }
+
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    onSubmit(dest, amountResult.value);
+    onSubmit(dest, amountResult.value, memoResult.memo);
   }
 
   return (
@@ -79,6 +86,39 @@ export default function PaymentForm({
           />
           {errors.amount && (
             <p className="mt-1 text-sm text-red-400">{errors.amount}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="memoType" className="block text-sm text-slate-300">
+            Memo (optional)
+          </label>
+          <div className="mt-1 flex gap-2">
+            <select
+              id="memoType"
+              value={memoType}
+              onChange={(e) => setMemoType(e.target.value)}
+              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none focus:border-emerald-500"
+            >
+              <option value="none">None</option>
+              <option value="text">Text</option>
+              <option value="id">ID</option>
+            </select>
+
+            {memoType !== 'none' && (
+              <input
+                id="memo"
+                type="text"
+                inputMode={memoType === 'id' ? 'numeric' : 'text'}
+                value={memo}
+                onChange={(e) => setMemo(e.target.value)}
+                placeholder={memoType === 'id' ? 'e.g. 123456' : 'e.g. Order #42'}
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-600 focus:border-emerald-500"
+              />
+            )}
+          </div>
+          {errors.memo && (
+            <p className="mt-1 text-sm text-red-400">{errors.memo}</p>
           )}
         </div>
       </div>

@@ -1,4 +1,11 @@
-import { getNetwork, isConnected, requestAccess } from '@stellar/freighter-api';
+import {
+  getNetwork,
+  isConnected,
+  requestAccess,
+  signTransaction,
+} from '@stellar/freighter-api';
+
+import { NETWORK_PASSPHRASE } from './constants';
 
 /** Returns true if the Freighter browser extension is installed. */
 export async function isFreighterInstalled() {
@@ -27,4 +34,14 @@ export async function connectWallet() {
   if (error) throw new Error(error.message);
   if (!address) throw new Error('No account selected in Freighter.');
   return address;
+}
+
+/** Asks Freighter to sign a transaction XDR for the given account. */
+export async function signTransactionXdr(xdr, address) {
+  const { signedTxXdr, signerAddress, error } = await signTransaction(xdr, {
+    networkPassphrase: NETWORK_PASSPHRASE,
+    address,
+  });
+  if (error) throw new Error(error.message);
+  return { signedTxXdr, signerAddress };
 }

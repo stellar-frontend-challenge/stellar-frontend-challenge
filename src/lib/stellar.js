@@ -1,6 +1,17 @@
-import { Horizon, Keypair, NotFoundError } from '@stellar/stellar-sdk';
+import {
+  Asset,
+  Horizon,
+  Keypair,
+  NotFoundError,
+  Operation,
+  TransactionBuilder,
+} from '@stellar/stellar-sdk';
 
-import { HORIZON_URL, FRIENDBOT_URL } from './constants';
+import {
+  FRIENDBOT_URL,
+  HORIZON_URL,
+  NETWORK_PASSPHRASE,
+} from './constants';
 
 const server = new Horizon.Server(HORIZON_URL);
 
@@ -37,4 +48,37 @@ export async function fundAccount(publicKey) {
     );
   }
   return response.json();
+}
+
+/** Builds an unsigned XLM payment transaction for the given source account. */
+export async function buildPaymentTransaction({
+  sourcePublicKey,
+  destination,
+  amount,
+}) {
+  const sourceAccount = await server.loadAccount(sourcePublicKey);
+  const baseFee = await server.fetchBaseFee().catch(() => 100);
+
+  return new TransactionBuilder(sourceAccount, {
+    fee: baseFee.toString(),
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
+    .addOperation(
+      Operation.payment({
+        destination,
+        asset: Asset.native(),
+        amount: amount.toString(),
+      }),
+    )
+    .setTimeout(60)
+    .build();
+}
+
+/** Rehydrates a signed XDR string and submits it to Horizon. */
+export async function submitSignedTransaction(signedTxXdr) {
+  const transaction = TransactionBuilder.fromXDR(
+    signedTxXdr,
+    NETWORK_PASSPHRASE,
+  );
+  return server.submitTransaction(transaction);
 }

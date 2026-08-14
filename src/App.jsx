@@ -5,14 +5,17 @@ import PaymentForm from './components/PaymentForm';
 import WalletConnect from './components/WalletConnect';
 import { NETWORK_NAME } from './lib/constants';
 import {
+  buildPaymentTransaction,
   fetchXlmBalance,
   fundAccount,
   isAccountNotFound,
+  submitSignedTransaction,
 } from './lib/stellar';
 import {
   connectWallet,
   getWalletNetworkName,
   isFreighterInstalled,
+  signTransactionXdr,
 } from './lib/wallet';
 
 export default function App() {
@@ -31,6 +34,8 @@ export default function App() {
   const [funding, setFunding] = useState(false);
   const [fundMessage, setFundMessage] = useState(null);
   const [fundError, setFundError] = useState(null);
+
+  const [txStatus, setTxStatus] = useState({ status: 'idle' });
 
   const detectWallet = useCallback(async () => {
     let installed = false;
@@ -104,6 +109,7 @@ export default function App() {
     setExists(null);
     setFundMessage(null);
     setFundError(null);
+    setTxStatus({ status: 'idle' });
   }
 
   async function handleFund() {
@@ -121,8 +127,25 @@ export default function App() {
     }
   }
 
-  // Build/sign/submit transaction logic lands in a follow-up step.
-  async function handleSendPayment() {}
+  async function handleSendPayment(destination, amount) {
+    setTxStatus({ status: 'pending' });
+    try {
+      const transaction = await buildPaymentTransaction({
+        sourcePublicKey: address,
+        destination,
+        amount,
+      });
+      const { signedTxXdr } = await signTransactionXdr(
+        transaction.toXDR(),
+        address,
+      );
+      const result = await submitSignedTransaction(signedTxXdr);
+      setTxStatus({ status: 'success', hash: result.hash });
+      refreshBalance(address);
+    } catch (err) {
+      setTxStatus({ status: 'error', error: err?.message || 'Payment failed.' });
+    }
+  }
 
   const readyToSend = Boolean(address) && network === NETWORK_NAME;
 
@@ -162,7 +185,7 @@ export default function App() {
 
           <PaymentForm
             disabled={!readyToSend}
-            submitting={false}
+            submitting={txStatus.status === 'pending'}
             onSubmit={handleSendPayment}
           />
         </div>

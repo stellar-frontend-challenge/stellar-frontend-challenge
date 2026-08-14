@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import BalanceDisplay from './components/BalanceDisplay';
+import PaymentForm from './components/PaymentForm';
 import WalletConnect from './components/WalletConnect';
+import { NETWORK_NAME } from './lib/constants';
 import {
   fetchXlmBalance,
   fundAccount,
@@ -119,6 +121,11 @@ export default function App() {
     }
   }
 
+  // Build/sign/submit transaction logic lands in a follow-up step.
+  async function handleSendPayment() {}
+
+  const readyToSend = Boolean(address) && network === NETWORK_NAME;
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-lg px-4 py-10">
@@ -151,6 +158,12 @@ export default function App() {
             fundError={fundError}
             onRefresh={() => refreshBalance(address)}
             onFund={handleFund}
+          />
+
+          <PaymentForm
+            disabled={!readyToSend}
+            submitting={false}
+            onSubmit={handleSendPayment}
           />
         </div>
       </div>

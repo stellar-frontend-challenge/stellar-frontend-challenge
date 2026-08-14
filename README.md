@@ -8,6 +8,11 @@ for wallet integration, and [`@stellar/stellar-sdk`](https://www.npmjs.com/packa
 for blockchain interactions. All network calls target the Testnet Horizon server
 (`https://horizon-testnet.stellar.org`).
 
+## Links
+
+- **Live app:** <https://stellar-frontend-challenge.github.io/stellar-frontend-challenge/>
+- **Source code:** <https://github.com/stellar-frontend-challenge/stellar-frontend-challenge>
+
 ## Features
 
 - Detects Freighter and warns when it is missing or not set to Testnet
@@ -36,10 +41,6 @@ for blockchain interactions. All network calls target the Testnet Horizon server
 **Transaction result shown to the user**
 
 ![Transaction result shown to the user](screenshots/transaction-result.png)
-
-> These are illustrative mockups. To replace them with real screenshots, run the
-> app with Freighter connected, capture each state, save the images into
-> `screenshots/`, and update the image paths above.
 
 ## Prerequisites
 
@@ -88,6 +89,21 @@ npm run build
 npm run preview
 ```
 
+### Deploy to GitHub Pages
+
+The repo is configured to deploy automatically via GitHub Actions
+(`.github/workflows/deploy.yml`): every push to `main` builds the app and
+publishes `dist/` to GitHub Pages.
+
+One-time setup:
+
+1. In the repo on GitHub, go to **Settings → Pages**.
+2. Under **Build and deployment → Source**, select **GitHub Actions**.
+3. Push to `main` (or run the workflow manually from the **Actions** tab).
+
+The app is then served at
+<https://stellar-frontend-challenge.github.io/stellar-frontend-challenge/>.
+
 ## Project structure
 
 ```
@@ -104,7 +120,7 @@ src/
     format.js              # address truncation and amount validation
   App.jsx                  # state + wiring
   main.jsx                 # React entry point
-screenshots/               # README screenshots (mockups)
+screenshots/               # README screenshots
 ```
 
 ## Notes

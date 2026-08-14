@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <rect width="520" height="420" fill="#020617"/>
+
+  <!-- header -->
+  <rect x="215" y="24" width="90" height="26" rx="13" fill="#0f172a" fill-opacity="0.6" stroke="#1e293b"/>
+  <circle cx="233" cy="37" r="4" fill="#34d399"/>
+  <text x="243" y="41" font-size="12" fill="#cbd5e1">Testnet</text>
+  <text x="260" y="80" font-size="30" font-weight="700" fill="#f1f5f9" text-anchor="middle">Stellar Payment dApp</text>
+  <text x="260" y="100" font-size="14" fill="#94a3b8" text-anchor="middle">Send XLM on the Stellar Testnet with Freighter.</text>
+
+  <!-- wallet card -->
+  <rect x="20" y="128" width="480" height="96" rx="12" fill="#0f172a" fill-opacity="0.6" stroke="#1e293b"/>
+  <text x="40" y="162" font-size="18" font-weight="600" fill="#f1f5f9">Wallet</text>
+  <text x="40" y="190" font-size="14" fill="#cbd5e1" font-family="ui-monospace, Menlo, Consolas, monospace">GABC...WXYZ</text>
+  <rect x="376" y="140" width="104" height="34" rx="8" fill="none" stroke="#334155"/>
+  <text x="428" y="162" font-size="14" fill="#e2e8f0" text-anchor="middle">Disconnect</text>
+
+  <!-- balance card -->
+  <rect x="20" y="240" width="480" height="120" rx="12" fill="#0f172a" fill-opacity="0.6" stroke="#1e293b"/>
+  <text x="40" y="274" font-size="18" font-weight="600" fill="#f1f5f9">XLM Balance</text>
+  <rect x="396" y="252" width="84" height="32" rx="8" fill="none" stroke="#334155"/>
+  <text x="438" y="273" font-size="14" fill="#e2e8f0" text-anchor="middle">Refresh</text>
+  <text x="40" y="326" font-size="24" font-weight="600" fill="#f1f5f9">10000.0000000 <tspan font-size="16" font-weight="400" fill="#94a3b8">XLM</tspan></text>
+</svg>

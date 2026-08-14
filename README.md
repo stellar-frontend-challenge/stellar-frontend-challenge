@@ -19,6 +19,20 @@ for blockchain interactions. All network calls target the Testnet Horizon server
 - Validates the destination address, amount, and memo before submitting
 - Shows pending / success (with Stellar Expert link) / failure feedback
 
+## Screenshots
+
+| Wallet connected | Balance displayed |
+| --- | --- |
+| ![Wallet connected](screenshots/wallet-connected.svg) | ![Balance displayed](screenshots/balance-displayed.svg) |
+
+| Successful testnet transaction | Result shown to the user |
+| --- | --- |
+| ![Successful testnet transaction](screenshots/transaction-success.svg) | ![Transaction result](screenshots/transaction-result.svg) |
+
+> These are illustrative SVG mockups. To replace them with real screenshots, run
+> the app with Freighter connected, capture each state, save the images into
+> `screenshots/`, and update the image paths above.
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org) 20.19+ (or 22.12+)
@@ -82,6 +96,7 @@ src/
     format.js              # address truncation and amount validation
   App.jsx                  # state + wiring
   main.jsx                 # React entry point
+screenshots/               # README screenshots (SVG mockups)
 ```
 
 ## Notes

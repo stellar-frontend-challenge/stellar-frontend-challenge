@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import BalanceDisplay from './components/BalanceDisplay';
 import WalletConnect from './components/WalletConnect';
+import {
+  fetchXlmBalance,
+  isAccountNotFound,
+} from './lib/stellar';
 import {
   connectWallet,
   getWalletNetworkName,
@@ -14,6 +19,11 @@ export default function App() {
 
   const [walletInstalled, setWalletInstalled] = useState(null);
   const [network, setNetwork] = useState(null);
+
+  const [balance, setBalance] = useState(null);
+  const [balanceLoading, setBalanceLoading] = useState(false);
+  const [balanceError, setBalanceError] = useState(null);
+  const [exists, setExists] = useState(null);
 
   const detectWallet = useCallback(async () => {
     let installed = false;
@@ -39,6 +49,32 @@ export default function App() {
     detectWallet();
   }, [detectWallet]);
 
+  const refreshBalance = useCallback(async (publicKey) => {
+    if (!publicKey) return;
+    setBalanceLoading(true);
+    setBalanceError(null);
+    try {
+      const value = await fetchXlmBalance(publicKey);
+      setBalance(value);
+      setExists(true);
+    } catch (err) {
+      if (isAccountNotFound(err)) {
+        setExists(false);
+        setBalance(null);
+      } else {
+        setBalanceError(
+          err?.message || 'Failed to load balance. Please try again.',
+        );
+      }
+    } finally {
+      setBalanceLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (address) refreshBalance(address);
+  }, [address, refreshBalance]);
+
   async function handleConnect() {
     setConnecting(true);
     setConnectError(null);
@@ -56,6 +92,9 @@ export default function App() {
   function handleDisconnect() {
     setAddress(null);
     setConnectError(null);
+    setBalance(null);
+    setBalanceError(null);
+    setExists(null);
   }
 
   return (
@@ -68,15 +107,26 @@ export default function App() {
           </p>
         </header>
 
-        <WalletConnect
-          address={address}
-          connecting={connecting}
-          walletInstalled={walletInstalled}
-          network={network}
-          connectError={connectError}
-          onConnect={handleConnect}
-          onDisconnect={handleDisconnect}
-        />
+        <div className="space-y-4">
+          <WalletConnect
+            address={address}
+            connecting={connecting}
+            walletInstalled={walletInstalled}
+            network={network}
+            connectError={connectError}
+            onConnect={handleConnect}
+            onDisconnect={handleDisconnect}
+          />
+
+          <BalanceDisplay
+            address={address}
+            balance={balance}
+            loading={balanceLoading}
+            error={balanceError}
+            exists={exists}
+            onRefresh={() => refreshBalance(address)}
+          />
+        </div>
       </div>
     </main>
   );

@@ -3,6 +3,7 @@ import {
   isConnected,
   requestAccess,
   signTransaction,
+  WatchWalletChanges,
 } from '@stellar/freighter-api';
 
 import { NETWORK_PASSPHRASE } from './constants';
@@ -44,4 +45,20 @@ export async function signTransactionXdr(xdr, address) {
   });
   if (error) throw new Error(error.message);
   return { signedTxXdr, signerAddress };
+}
+
+/**
+ * Watches Freighter for account or network changes and calls `onChange` only
+ * when something actually changes. Returns a function that stops watching.
+ */
+export function watchWalletChanges(onChange, timeout) {
+  const watcher = new WatchWalletChanges(timeout);
+  const { error } = watcher.watch(
+    ({ address, network, networkPassphrase, error: apiError }) => {
+      if (apiError) return;
+      onChange({ address, network, networkPassphrase });
+    },
+  );
+  if (error) return () => {};
+  return () => watcher.stop();
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import BalanceDisplay from './components/BalanceDisplay';
 import PaymentForm from './components/PaymentForm';
@@ -18,6 +18,7 @@ import {
   getWalletNetworkName,
   isFreighterInstalled,
   signTransactionXdr,
+  watchWalletChanges,
 } from './lib/wallet';
 
 export default function App() {
@@ -38,6 +39,23 @@ export default function App() {
   const [fundError, setFundError] = useState(null);
 
   const [txStatus, setTxStatus] = useState({ status: 'idle' });
+
+  const addressRef = useRef(address);
+
+  useEffect(() => {
+    addressRef.current = address;
+  }, [address]);
+
+  const clearSession = useCallback(() => {
+    setAddress(null);
+    setConnectError(null);
+    setBalance(null);
+    setBalanceError(null);
+    setExists(null);
+    setFundMessage(null);
+    setFundError(null);
+    setTxStatus({ status: 'idle' });
+  }, []);
 
   const detectWallet = useCallback(async () => {
     let installed = false;
@@ -101,16 +119,25 @@ export default function App() {
     }
   }
 
-  function handleDisconnect() {
-    setAddress(null);
-    setConnectError(null);
-    setBalance(null);
-    setBalanceError(null);
-    setExists(null);
-    setFundMessage(null);
-    setFundError(null);
-    setTxStatus({ status: 'idle' });
-  }
+  // React to account / network changes coming from Freighter itself.
+  useEffect(() => {
+    if (!walletInstalled) return undefined;
+
+    return watchWalletChanges(({ address: nextAddress, network: nextNetwork }) => {
+      if (nextNetwork) setNetwork(nextNetwork);
+
+      // Only react to account events while a session is active, so we never
+      // auto-reconnect after the user disconnects or on a fresh page load.
+      const current = addressRef.current;
+      if (!current) return;
+
+      if (nextAddress && nextAddress !== current) {
+        setAddress(nextAddress); // account switched → balance refreshes
+      } else if (!nextAddress) {
+        clearSession(); // wallet locked or access revoked in Freighter
+      }
+    });
+  }, [walletInstalled, clearSession]);
 
   async function handleFund() {
     setFunding(true);
@@ -179,7 +206,7 @@ export default function App() {
             network={network}
             connectError={connectError}
             onConnect={handleConnect}
-            onDisconnect={handleDisconnect}
+            onDisconnect={clearSession}
           />
 
           <BalanceDisplay

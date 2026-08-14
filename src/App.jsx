@@ -76,9 +76,7 @@ export default function App() {
         setExists(false);
         setBalance(null);
       } else {
-        setBalanceError(
-          err?.message || 'Failed to load balance. Please try again.',
-        );
+        setBalanceError(formatError(err));
       }
     } finally {
       setBalanceLoading(false);
@@ -188,6 +186,7 @@ export default function App() {
           <PaymentForm
             disabled={!readyToSend}
             submitting={txStatus.status === 'pending'}
+            selfAddress={address}
             onSubmit={handleSendPayment}
           />
 

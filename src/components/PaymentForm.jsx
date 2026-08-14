@@ -3,7 +3,12 @@ import { useState } from 'react';
 import { validateAmount } from '../lib/format';
 import { isValidAddress } from '../lib/stellar';
 
-export default function PaymentForm({ disabled, submitting, onSubmit }) {
+export default function PaymentForm({
+  disabled,
+  submitting,
+  selfAddress,
+  onSubmit,
+}) {
   const [destination, setDestination] = useState('');
   const [amount, setAmount] = useState('');
   const [errors, setErrors] = useState({});
@@ -11,11 +16,14 @@ export default function PaymentForm({ disabled, submitting, onSubmit }) {
   function handleSubmit(event) {
     event.preventDefault();
     const nextErrors = {};
+    const dest = destination.trim();
 
-    if (!destination.trim()) {
+    if (!dest) {
       nextErrors.destination = 'Destination address is required.';
-    } else if (!isValidAddress(destination.trim())) {
+    } else if (!isValidAddress(dest)) {
       nextErrors.destination = 'Please enter a valid Stellar public key.';
+    } else if (selfAddress && dest === selfAddress) {
+      nextErrors.destination = 'Cannot send to your own address.';
     }
 
     const amountResult = validateAmount(amount);
@@ -26,7 +34,7 @@ export default function PaymentForm({ disabled, submitting, onSubmit }) {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    onSubmit(destination.trim(), amountResult.value);
+    onSubmit(dest, amountResult.value);
   }
 
   return (

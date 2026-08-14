@@ -4,7 +4,11 @@ export default function BalanceDisplay({
   loading,
   error,
   exists,
+  funding,
+  fundMessage,
+  fundError,
   onRefresh,
+  onFund,
 }) {
   if (!address) return null;
 
@@ -34,6 +38,20 @@ export default function BalanceDisplay({
             <p className="text-sm text-amber-200">
               This account is not funded on the testnet yet.
             </p>
+            <button
+              type="button"
+              onClick={onFund}
+              disabled={funding}
+              className="mt-3 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:opacity-50"
+            >
+              {funding ? 'Funding…' : 'Fund with Friendbot'}
+            </button>
+            {fundMessage && (
+              <p className="mt-2 text-sm text-emerald-300">{fundMessage}</p>
+            )}
+            {fundError && (
+              <p className="mt-2 text-sm text-red-300">{fundError}</p>
+            )}
           </div>
         ) : (
           <p className="text-2xl font-semibold text-slate-100">

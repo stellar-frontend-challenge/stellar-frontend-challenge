@@ -4,6 +4,7 @@ import BalanceDisplay from './components/BalanceDisplay';
 import WalletConnect from './components/WalletConnect';
 import {
   fetchXlmBalance,
+  fundAccount,
   isAccountNotFound,
 } from './lib/stellar';
 import {
@@ -24,6 +25,10 @@ export default function App() {
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [balanceError, setBalanceError] = useState(null);
   const [exists, setExists] = useState(null);
+
+  const [funding, setFunding] = useState(false);
+  const [fundMessage, setFundMessage] = useState(null);
+  const [fundError, setFundError] = useState(null);
 
   const detectWallet = useCallback(async () => {
     let installed = false;
@@ -95,6 +100,23 @@ export default function App() {
     setBalance(null);
     setBalanceError(null);
     setExists(null);
+    setFundMessage(null);
+    setFundError(null);
+  }
+
+  async function handleFund() {
+    setFunding(true);
+    setFundError(null);
+    setFundMessage(null);
+    try {
+      await fundAccount(address);
+      setFundMessage('Account funded! Refreshing balance…');
+      await refreshBalance(address);
+    } catch (err) {
+      setFundError(err?.message || 'Funding failed. Please try again.');
+    } finally {
+      setFunding(false);
+    }
   }
 
   return (
@@ -124,7 +146,11 @@ export default function App() {
             loading={balanceLoading}
             error={balanceError}
             exists={exists}
+            funding={funding}
+            fundMessage={fundMessage}
+            fundError={fundError}
             onRefresh={() => refreshBalance(address)}
+            onFund={handleFund}
           />
         </div>
       </div>

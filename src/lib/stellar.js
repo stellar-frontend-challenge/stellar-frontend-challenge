@@ -1,6 +1,6 @@
 import { Horizon, Keypair, NotFoundError } from '@stellar/stellar-sdk';
 
-import { HORIZON_URL } from './constants';
+import { HORIZON_URL, FRIENDBOT_URL } from './constants';
 
 const server = new Horizon.Server(HORIZON_URL);
 
@@ -24,4 +24,17 @@ export async function fetchXlmBalance(publicKey) {
   const account = await server.loadAccount(publicKey);
   const native = account.balances.find((b) => b.asset_type === 'native');
   return native?.balance ?? '0.0000000';
+}
+
+/** Funds a new testnet account via Friendbot. */
+export async function fundAccount(publicKey) {
+  const response = await fetch(
+    `${FRIENDBOT_URL}?addr=${encodeURIComponent(publicKey)}`,
+  );
+  if (!response.ok) {
+    throw new Error(
+      `Friendbot request failed with status ${response.status}.`,
+    );
+  }
+  return response.json();
 }

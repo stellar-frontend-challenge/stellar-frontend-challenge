@@ -21,16 +21,24 @@ for blockchain interactions. All network calls target the Testnet Horizon server
 
 ## Screenshots
 
-| Wallet connected | Balance displayed |
-| --- | --- |
-| ![Wallet connected](screenshots/wallet-connected.svg) | ![Balance displayed](screenshots/balance-displayed.svg) |
+**Wallet connected**
 
-| Successful testnet transaction | Result shown to the user |
-| --- | --- |
-| ![Successful testnet transaction](screenshots/transaction-success.svg) | ![Transaction result](screenshots/transaction-result.svg) |
+![Wallet connected](screenshots/wallet-connected.png)
 
-> These are illustrative SVG mockups. To replace them with real screenshots, run
-> the app with Freighter connected, capture each state, save the images into
+**Balance displayed**
+
+![Balance displayed](screenshots/balance-displayed.png)
+
+**Successful testnet transaction**
+
+![Successful testnet transaction](screenshots/transaction-success.png)
+
+**Transaction result shown to the user**
+
+![Transaction result shown to the user](screenshots/transaction-result.png)
+
+> These are illustrative mockups. To replace them with real screenshots, run the
+> app with Freighter connected, capture each state, save the images into
 > `screenshots/`, and update the image paths above.
 
 ## Prerequisites
@@ -96,7 +104,7 @@ src/
     format.js              # address truncation and amount validation
   App.jsx                  # state + wiring
   main.jsx                 # React entry point
-screenshots/               # README screenshots (SVG mockups)
+screenshots/               # README screenshots (mockups)
 ```
 
 ## Notes

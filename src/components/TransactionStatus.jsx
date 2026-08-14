@@ -1,6 +1,15 @@
 import { STELLAR_EXPERT_TX_URL } from '../lib/constants';
+import { truncateAddress } from '../lib/format';
 
-export default function TransactionStatus({ status, hash, memo, error, onReset }) {
+export default function TransactionStatus({
+  status,
+  hash,
+  amount,
+  destination,
+  memo,
+  error,
+  onReset,
+}) {
   if (status === 'idle') return null;
 
   if (status === 'pending') {
@@ -20,15 +29,27 @@ export default function TransactionStatus({ status, hash, memo, error, onReset }
     return (
       <div className="rounded-xl border border-emerald-800/50 bg-emerald-900/20 p-5">
         <h3 className="font-semibold text-emerald-300">Payment successful 🎉</h3>
-        <p className="mt-1 break-all font-mono text-sm text-emerald-200">
+        <div className="mt-2 space-y-1 text-sm text-emerald-200/80">
+          <p>
+            Amount:{' '}
+            <span className="font-mono text-emerald-200">{amount} XLM</span>
+          </p>
+          <p>
+            To:{' '}
+            <span className="font-mono text-emerald-200" title={destination}>
+              {truncateAddress(destination)}
+            </span>
+          </p>
+          {memo && (
+            <p>
+              Memo ({memo.type === 'id' ? 'ID' : 'text'}):{' '}
+              <span className="font-mono">{memo.value}</span>
+            </p>
+          )}
+        </div>
+        <p className="mt-3 break-all font-mono text-xs text-emerald-300/70">
           {hash}
         </p>
-        {memo && (
-          <p className="mt-2 text-sm text-emerald-200/80">
-            Memo ({memo.type === 'id' ? 'ID' : 'text'}):{' '}
-            <span className="font-mono">{memo.value}</span>
-          </p>
-        )}
         <a
           href={`${STELLAR_EXPERT_TX_URL}/${hash}`}
           target="_blank"

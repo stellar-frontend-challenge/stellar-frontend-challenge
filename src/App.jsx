@@ -168,7 +168,13 @@ export default function App() {
         address,
       );
       const result = await submitSignedTransaction(signedTxXdr);
-      setTxStatus({ status: 'success', hash: result.hash, memo });
+      setTxStatus({
+        status: 'success',
+        hash: result.hash,
+        amount,
+        destination,
+        memo,
+      });
       refreshBalance(address);
     } catch (err) {
       setTxStatus({ status: 'error', error: formatError(err) });

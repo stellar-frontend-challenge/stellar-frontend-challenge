@@ -153,6 +153,18 @@ export default function App() {
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-lg px-4 py-10">
         <header className="mb-8 text-center">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1 text-xs font-medium text-slate-300">
+            <span
+              className={`h-2 w-2 rounded-full ${
+                network === NETWORK_NAME ? 'bg-emerald-400' : 'bg-amber-400'
+              }`}
+            />
+            {network === NETWORK_NAME
+              ? 'Testnet'
+              : network
+                ? network
+                : 'Network unknown'}
+          </div>
           <h1 className="text-3xl font-bold">Stellar Payment dApp</h1>
           <p className="mt-2 text-sm text-slate-400">
             Send XLM on the Stellar Testnet with Freighter.
@@ -197,6 +209,10 @@ export default function App() {
             onReset={() => setTxStatus({ status: 'idle' })}
           />
         </div>
+
+        <footer className="mt-10 text-center text-xs text-slate-600">
+          Testnet only — no real funds are used.
+        </footer>
       </div>
     </main>
   );

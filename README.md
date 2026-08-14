@@ -15,7 +15,8 @@ for blockchain interactions. All network calls target the Testnet Horizon server
 - Fetches and displays your XLM balance with a refresh button
 - Funds unfunded testnet accounts via Friendbot
 - Sends XLM payments: build → sign (Freighter) → submit (Horizon)
-- Validates the destination address and amount before submitting
+- Supports an optional memo (text or id) attached to the payment
+- Validates the destination address, amount, and memo before submitting
 - Shows pending / success (with Stellar Expert link) / failure feedback
 
 ## Prerequisites

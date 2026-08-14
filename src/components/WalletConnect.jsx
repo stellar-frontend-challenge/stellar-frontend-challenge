@@ -8,6 +8,7 @@ export default function WalletConnect({
   network,
   connectError,
   onConnect,
+  onDisconnect,
 }) {
   const connected = Boolean(address);
   const wrongNetwork = network && network !== NETWORK_NAME;
@@ -26,7 +27,15 @@ export default function WalletConnect({
           )}
         </div>
 
-        {!connected && (
+        {connected ? (
+          <button
+            type="button"
+            onClick={onDisconnect}
+            className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-800"
+          >
+            Disconnect
+          </button>
+        ) : (
           <button
             type="button"
             onClick={onConnect}

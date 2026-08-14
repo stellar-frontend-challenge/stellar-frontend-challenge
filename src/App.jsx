@@ -53,6 +53,11 @@ export default function App() {
     }
   }
 
+  function handleDisconnect() {
+    setAddress(null);
+    setConnectError(null);
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-lg px-4 py-10">
@@ -70,6 +75,7 @@ export default function App() {
           network={network}
           connectError={connectError}
           onConnect={handleConnect}
+          onDisconnect={handleDisconnect}
         />
       </div>
     </main>

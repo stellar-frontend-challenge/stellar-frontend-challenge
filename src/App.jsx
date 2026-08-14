@@ -1,9 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { NETWORK_NAME } from './lib/constants';
-import { getWalletNetworkName, isFreighterInstalled } from './lib/wallet';
+import WalletConnect from './components/WalletConnect';
+import {
+  connectWallet,
+  getWalletNetworkName,
+  isFreighterInstalled,
+} from './lib/wallet';
 
 export default function App() {
+  const [address, setAddress] = useState(null);
+  const [connecting, setConnecting] = useState(false);
+  const [connectError, setConnectError] = useState(null);
+
   const [walletInstalled, setWalletInstalled] = useState(null);
   const [network, setNetwork] = useState(null);
 
@@ -31,6 +39,20 @@ export default function App() {
     detectWallet();
   }, [detectWallet]);
 
+  async function handleConnect() {
+    setConnecting(true);
+    setConnectError(null);
+    try {
+      const publicKey = await connectWallet();
+      setAddress(publicKey);
+      await detectWallet();
+    } catch (err) {
+      setConnectError(err.message);
+    } finally {
+      setConnecting(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-lg px-4 py-10">
@@ -41,28 +63,14 @@ export default function App() {
           </p>
         </header>
 
-        {walletInstalled === false && (
-          <p className="rounded-lg border border-amber-700/50 bg-amber-900/20 p-4 text-sm text-amber-200">
-            Freighter is not installed.{' '}
-            <a
-              href="https://freighter.app"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              Install Freighter
-            </a>{' '}
-            and refresh this page.
-          </p>
-        )}
-
-        {walletInstalled && network && network !== NETWORK_NAME && (
-          <p className="rounded-lg border border-amber-700/50 bg-amber-900/20 p-4 text-sm text-amber-200">
-            Freighter is connected to{' '}
-            <span className="font-mono">{network}</span>. Switch it to{' '}
-            <span className="font-mono">Testnet</span> to use this app.
-          </p>
-        )}
+        <WalletConnect
+          address={address}
+          connecting={connecting}
+          walletInstalled={walletInstalled}
+          network={network}
+          connectError={connectError}
+          onConnect={handleConnect}
+        />
       </div>
     </main>
   );
